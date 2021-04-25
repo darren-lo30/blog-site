@@ -25,7 +25,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Connect to database
 const mongoDBURI = process.env.DATABASE_URI as string;
 mongoose.connect(mongoDBURI, { useNewUrlParser: true, useUnifiedTopology: true });
-console.log(mongoDBURI);
 mongoose.set('useFindAndModify', false);
 
 const db = mongoose.connection;
@@ -33,6 +32,9 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error: '));
 db.on('connected', () => { console.log('Connected succesfully'); });
 /* eslint-enable no-console */
+
+// Set current user if they are already logged in
+// app.use('/', );
 
 // Set up routing
 app.use('/', indexRouter);
@@ -45,6 +47,6 @@ app.use((req, res, next) => {
 
 // error handler
 // You need next or else error handling middleware will not run
-app.use(((err, req, res, next) => res.render('error', { error: err })) as ErrorRequestHandler);
+app.use(((err, req, res, next) => res.json(err)) as ErrorRequestHandler);
 
 export default app;
