@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 const commentable = [
-  'Post', 'Comment'
+  'Post', 'Comment',
 ];
 
 const CommentSchema = new Schema({
@@ -19,6 +19,6 @@ export interface IPost extends Document {
   message: string,
   parent?: Schema.Types.ObjectId,
   parentModel: string
-};
+}
 
 export default mongoose.model<IPost>('Comment', CommentSchema);

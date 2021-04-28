@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 "use strict";
-/**
- * Module dependencies.
- */
+/* eslint-disable no-console */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Module dependencies.
+ */
 const debug_1 = __importDefault(require("debug"));
 const http_1 = __importDefault(require("http"));
 const app_1 = __importDefault(require("../app"));
@@ -75,3 +76,4 @@ function onListening() {
         : `port ${addr.port}`;
     debug(`Listening on ${bind}`);
 }
+//# sourceMappingURL=www.js.map

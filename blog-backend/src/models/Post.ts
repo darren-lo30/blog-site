@@ -10,7 +10,7 @@ const PostSchema: Schema = new Schema({
 export interface IPost extends Document {
   author: string,
   datePosted: Date,
-  title: string, 
+  title: string,
   body: string
 }
 
