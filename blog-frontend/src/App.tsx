@@ -6,7 +6,6 @@ import axios from 'axios';
 import Template from './Template';
 import Feed from './pages/Feed';
 import SignIn from './authentication/SignIn';
-import SignUp from './authentication/SignUp';
 import Profile from './pages/Profile';
 import Landing from './pages/Landing';
 import ErrorHandler from './ErrorHandler';
@@ -14,6 +13,8 @@ import Error from './pages/Error';
 import Loader from './components/Loader';
 import PostForm from './pages/PostForm';
 import Post from './pages/Post';
+import ProfileEdit from './pages/ProfileEdit';
+import UserForm from './authentication/UserForm';
 
 type AuthRouteProps = {
   component: React.ComponentType<any>,
@@ -91,15 +92,28 @@ const App = () => {
               <AuthRoute exact path="/posts" component={() => <Feed isAdmin={isAdmin} />} signedInId={signedInId} />
 
               <AdminRoute exact component={() => <PostForm action="create" />} path="/posts/new" isAdmin={isAdmin} />
-              <AdminRoute exact component={() => <PostForm action="edit" />} path="/posts/:id/edit" isAdmin={isAdmin} />
+              <Route exact component={() => <PostForm action="edit" signedInId={signedInId} />} path="/posts/:id/edit" />
               <Route exact path="/posts/:id" component={() => <Post signedInId={signedInId} />} />
-              {/* <AdminRoute exact path="/posts/update" isAdmin={isAdmin} /> */}
               <Route exact path="/users/:id" component={() => <Profile signedInId={signedInId} />} />
-              {/* <AuthRoute exact path="/users/edit" signedInId={signedInId} component={() => <ProfileEdit userId={signedInId} />} /> */}
+              <AuthRoute
+                exact
+                path="/users/:id/edit"
+                signedInId={signedInId}
+                component={() => <UserForm action="edit" setUser={setUser} signedInId={signedInId} />}
+              />
               { !signedInId ? (
                 <div>
-                  <Route exact path="/sign-up" component={() => <SignUp setUser={setUser} />} />
-                  <Route exact path="/sign-in" component={() => <SignIn setUser={setUser} />} />
+                  <Route
+                    exact
+                    path="/sign-up"
+                    component={() => <UserForm action="create" setUser={setUser} signedInId={signedInId} />}
+                  />
+
+                  <Route
+                    exact
+                    path="/sign-in"
+                    component={() => <SignIn setUser={setUser} />}
+                  />
                 </div>
               ) : null}
               <Route render={() => <Error statusCode="404" />} />

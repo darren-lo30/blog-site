@@ -18,6 +18,7 @@ router.post('/sign-up', usersController.create, async (req, res, next) => {
 router.post(['/sign-in', '/log-in'], (req, res, next) => {
   passport.authenticate('local', { session: false }, (authErr, user, info) => {
     if (authErr || !user) {
+      console.log(info);
       return res.status(401).json({
         msg: 'Unable to login',
       });

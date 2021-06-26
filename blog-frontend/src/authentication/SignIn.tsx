@@ -34,9 +34,9 @@ const SignIn = ({ setUser }: SignInProps) => {
       setUser(response.data.user);
       history.push('/');
     } catch (error: any) {
-      if (error.response.data.message) {
+      if (error.response.data.msg) {
         // Unable to log in due to incorrect login info
-        setErrors([error.response.data.message]);
+        setErrors([error.response.data.msg]);
       } else if (error.response.data.validationErrs) {
         // Post data was invalid
         setErrors(error.response.data.validationErrs.errors.map((errorObj:any) => errorObj.msg));

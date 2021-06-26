@@ -135,7 +135,7 @@ exports.update = [
 
     try {
       await user.save();
-      return res.json({ user, token: generateToken(user!) });
+      return res.cookie('token', generateToken(user!), { sameSite: 'strict', path: '/', httpOnly: true }).json({ user });
     } catch (updateErr) {
       return next(updateErr);
     }

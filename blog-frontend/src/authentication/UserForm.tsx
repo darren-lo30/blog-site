@@ -1,42 +1,70 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import uniqid from 'uniqid';
 import axios from 'axios';
 import Button from '../components/Button';
-
 import Input from '../components/forms/Input';
+import setErrorStatusCode from '../ErrorHandler';
 
-type SignUpProps = {
-  setUser: Function,
+type Params = {
+  id: string,
 }
 
-const SignUp = ({ setUser }: SignUpProps) => {
+type UserFormProps = {
+  action: 'create' | 'edit',
+  setUser: Function,
+  signedInId: string
+}
+
+const UserForm = ({ action, setUser, signedInId }: UserFormProps) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const history = useHistory();
+  const { id } = useParams<Params>();
 
-  function clearForm() {
-    setName('');
-    setEmail('');
-    setUsername('');
-    setPassword('');
-    setErrors([]);
-  }
+  useEffect(() => {
+    (async () => {
+      if (id) {
+        try {
+          const response = await axios.get(`/users/${id}`, { withCredentials: true });
+          const { user } = response.data;
+
+          setName(user.name);
+          setEmail(user.email);
+          setUsername(user.username);
+        } catch (error: any) {
+          setErrorStatusCode(error.respons.status);
+        }
+      }
+    })();
+  }, []);
 
   async function handleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     try {
-      const response = await axios.post('/sign-up', {
-        name, email, username, password,
-      }, { withCredentials: true });
+      if (action === 'create') {
+        // Sign up user
+        const response = await axios.post('/sign-up', {
+          name, email, username, password,
+        }, { withCredentials: true });
 
-      clearForm();
-      setUser(response.data.user);
-      // Redirect to home
-      history.push('/');
+        setUser(response.data.user);
+
+        // Redirect to home
+        history.push('/');
+      } else {
+        // Update the user
+        const response = await axios.put(`/users/${id}`, {
+          name, email, username, password,
+        }, { withCredentials: true });
+        setUser(response.data.user);
+
+        // Redirect user to their profil
+        history.push(`/users/${id}`);
+      }
     } catch (error: any) {
       if (error.response) {
         setErrors(error.response.data.validationErrs.errors.map((errorObj:any) => errorObj.msg));
@@ -50,7 +78,7 @@ const SignUp = ({ setUser }: SignUpProps) => {
     <div className="w-full flex-1 flex justify-center items-center">
       <div className="mx-3 w-2/3 md:w-1/2 lg:w-1/3 bg-gray-700 rounded">
         <form onSubmit={handleSubmit} className="text-white w-full pt-6 px-9 pb-8">
-          <h1 className="text-2xl text-center font-bold mb-5">Sign Up</h1>
+          <h1 className="text-2xl text-center font-bold mb-5">{ action === 'create' ? 'Sign Up' : 'Edit Profile' }</h1>
           <ul className="mb-3">
             { errors.map((error) => (
               <li key={uniqid()} className="text-red-200">{ error }</li>
@@ -100,7 +128,7 @@ const SignUp = ({ setUser }: SignUpProps) => {
             className="text-gray-700"
             required
           />
-          <Button type="submit" color="primary" className="rounded w-full my-3">Sign Up</Button>
+          <Button type="submit" color="primary" className="rounded w-full my-3">{ action === 'create' ? 'Sign Up' : 'Update' }</Button>
         </form>
       </div>
     </div>
@@ -108,4 +136,4 @@ const SignUp = ({ setUser }: SignUpProps) => {
   );
 };
 
-export default SignUp;
+export default UserForm;

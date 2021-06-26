@@ -9,7 +9,7 @@ import CommentDisplay from './CommentDisplay';
 import PostCommentInput from './PostCommentInput';
 import Button from '../../components/Button';
 
-type ParamProps = {
+type Params = {
   id: string
 }
 
@@ -19,7 +19,7 @@ type PostProps = {
 
 const Post = ({ signedInId }: PostProps) => {
   const [post, setPost] = useState<any>();
-  const { id } = useParams<ParamProps>();
+  const { id } = useParams<Params>();
   const { setErrorStatusCode } = useErrorStatus();
 
   const getPosts = async () => {

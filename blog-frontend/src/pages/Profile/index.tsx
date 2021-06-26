@@ -7,7 +7,7 @@ import Loader from '../../components/Loader';
 import { useErrorStatus } from '../../ErrorHandler';
 import Button from '../../components/Button';
 
-type ParamProps = {
+type Params = {
   id: string,
 }
 
@@ -16,7 +16,7 @@ type ProfileProps = {
 }
 const Profile = ({ signedInId } : ProfileProps) => {
   const [user, setUser] = useState<any>();
-  const { id } = useParams<ParamProps>();
+  const { id } = useParams<Params>();
   const { setErrorStatusCode } = useErrorStatus();
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const Profile = ({ signedInId } : ProfileProps) => {
         <p className="text-gray-300 mb-3">{ user.email }</p>
         <p className="text-gray-300 mb-3">{ capitalize(user.role) }</p>
         {signedInId === user._id ? (
-          <Link to="edit">
+          <Link to={`/users/${user._id}/edit`}>
             <Button color="primary">Edit Profile</Button>
           </Link>
         ) : null}

@@ -9,17 +9,18 @@ import setErrorStatusCode from '../../ErrorHandler';
 
 type PostFormProps = {
   action: 'edit' | 'create',
+  signedInId?: string,
 }
 
-type ParamProps = {
+type Params = {
   id: string
 }
 
-const PostForm = ({ action }: PostFormProps) => {
+const PostForm = ({ action, signedInId }: PostFormProps) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
-  const { id } = useParams<ParamProps>();
+  const { id } = useParams<Params>();
 
   const history = useHistory();
 
@@ -29,6 +30,11 @@ const PostForm = ({ action }: PostFormProps) => {
         try {
           const response = await axios.get(`/posts/${id}`, { withCredentials: true });
           const { post } = response.data;
+
+          // Redirect user if they are not the author of the post
+          if (post.author._id !== signedInId) {
+            history.push('/');
+          }
 
           setTitle(post.title);
           setBody(post.body);
