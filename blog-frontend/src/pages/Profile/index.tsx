@@ -5,12 +5,16 @@ import capitalize from 'capitalize';
 import uniqid from 'uniqid';
 import Loader from '../../components/Loader';
 import { useErrorStatus } from '../../ErrorHandler';
+import Button from '../../components/Button';
 
 type ParamProps = {
   id: string,
 }
 
-const Profile = () => {
+type ProfileProps = {
+  signedInId: string,
+}
+const Profile = ({ signedInId } : ProfileProps) => {
   const [user, setUser] = useState<any>();
   const { id } = useParams<ParamProps>();
   const { setErrorStatusCode } = useErrorStatus();
@@ -39,7 +43,12 @@ const Profile = () => {
         <h2 className="text-3xl inline mr-3">{ user.name }</h2>
         <span className="text-green-300">{ `@${user.username}` }</span>
         <p className="text-gray-300 mb-3">{ user.email }</p>
-        <p className="text-gray-300">{ capitalize(user.role) }</p>
+        <p className="text-gray-300 mb-3">{ capitalize(user.role) }</p>
+        {signedInId === user._id ? (
+          <Link to="edit">
+            <Button color="primary">Edit Profile</Button>
+          </Link>
+        ) : null}
       </section>
 
       {user.role === 'admin' ? (

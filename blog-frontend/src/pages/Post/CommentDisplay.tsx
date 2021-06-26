@@ -20,7 +20,7 @@ const CommentDisplay = ({ comment, getPosts }: CommentDisplayProps) => {
 
     (async () => {
       try {
-        await axios.post(`/comments/${comment._id}`, { message, parentModel: 'comment' }, { withCredentials: true });
+        await axios.post(`/comments/${comment.parentPost}`, { message, parentComment: comment._id }, { withCredentials: true });
         await getPosts();
         setMessage('');
       } catch (error: any) {
@@ -48,6 +48,9 @@ const CommentDisplay = ({ comment, getPosts }: CommentDisplayProps) => {
         <p className="text-sm text-green-300">{ comment.parent }</p>
       ) : null}
       <p className="pt-3">
+        { comment.parentComment ? (
+          <p className="underline text-green-300">{ `@${comment.parentComment}` }</p>
+        ) : null }
         { comment.message }
       </p>
       <div>

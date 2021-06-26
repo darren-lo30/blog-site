@@ -17,7 +17,7 @@ const PostCommentInput = ({ postId, getPosts }: PostCommentInputProps) => {
     event.preventDefault();
     (async () => {
       try {
-        await axios.post(`/comments/${postId}`, { message, parentModel: 'post' }, { withCredentials: true });
+        await axios.post(`/comments/${postId}`, { message }, { withCredentials: true });
         await getPosts();
 
         setMessage('');

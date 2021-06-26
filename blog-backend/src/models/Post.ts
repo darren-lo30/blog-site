@@ -7,6 +7,7 @@ export interface IPost extends Document, IAuthored {
   datePosted: Date,
   title: string,
   body: string
+  published: boolean
 }
 
 const PostSchema = new Schema<IPost>({
@@ -14,12 +15,13 @@ const PostSchema = new Schema<IPost>({
   datePosted: { type: Date, required: true },
   title: { type: String, required: true },
   body: { type: String, required: true },
+  published: { type: Boolean, required: true },
 }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 PostSchema.virtual('comments', {
   ref: 'Comment',
   localField: '_id',
-  foreignField: 'parent',
+  foreignField: 'parentPost',
 });
 
 // Determines if a user is allowed to work on this Post

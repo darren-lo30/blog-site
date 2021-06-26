@@ -1,24 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import uniqid from 'uniqid';
+import { useHistory, useParams } from 'react-router-dom';
 import Button from '../../components/Button';
 import Input from '../../components/forms/Input';
 import TextArea from '../../components/forms/TextArea';
+import setErrorStatusCode from '../../ErrorHandler';
 
 type PostFormProps = {
-  action: 'updated' | 'create',
-  postId?: string,
+  action: 'edit' | 'create',
 }
 
-const PostForm = ({ action, postId = '' }: PostFormProps) => {
+type ParamProps = {
+  id: string
+}
+
+const PostForm = ({ action }: PostFormProps) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
+  const { id } = useParams<ParamProps>();
 
-  const clearForm = () => {
-    setTitle('');
-    setBody('');
-  };
+  const history = useHistory();
+
+  useEffect(() => {
+    (async () => {
+      if (id) {
+        try {
+          const response = await axios.get(`/posts/${id}`, { withCredentials: true });
+          const { post } = response.data;
+
+          setTitle(post.title);
+          setBody(post.body);
+        } catch (error: any) {
+          setErrorStatusCode(error.response.status);
+        }
+      }
+    })();
+  }, []);
 
   const handleSubmit = (event : React.SyntheticEvent) => {
     event.preventDefault();
@@ -29,9 +48,9 @@ const PostForm = ({ action, postId = '' }: PostFormProps) => {
           await axios.post('/posts', { title, body }, { withCredentials: true });
         } else {
           // Update post
-          await axios.post(`/posts/${postId}`, { title, body }, { withCredentials: true });
+          await axios.put(`/posts/${id}`, { title, body }, { withCredentials: true });
         }
-        clearForm();
+        history.push(`/posts/${id}`);
       } catch (error: any) {
         if (error.response.data.validationErrs) {
           // Post data was invalid
@@ -64,6 +83,7 @@ const PostForm = ({ action, postId = '' }: PostFormProps) => {
             onChange={
               (event) => { setTitle(event.target.value); }
             }
+            className="text-gray-700"
           />
           <TextArea
             name="body"

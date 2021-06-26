@@ -65,6 +65,8 @@ const SignIn = ({ setUser }: SignInProps) => {
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>) => { setEmail(event.target.value); }
             }
+            className="text-gray-700"
+            required
           />
           <Input
             type="password"
@@ -74,6 +76,8 @@ const SignIn = ({ setUser }: SignInProps) => {
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setPassword(event.target.value);
             }}
+            className="text-gray-700"
+            required
           />
           <Button color="primary" type="submit" className="rounded w-full my-3">Sign In</Button>
         </form>

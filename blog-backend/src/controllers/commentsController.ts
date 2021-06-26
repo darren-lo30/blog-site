@@ -10,13 +10,8 @@ const validateCommentParams = () => [
     .trim()
     .isLength({ min: 1 })
     .withMessage('Message is required'),
-  body('parentModel')
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage('Comment requires a parent')
-    .customSanitizer((value) => capitalize(value))
-    .isIn(commentable)
-    .withMessage(`Comments can only be attached to ${commentable.join(' ')}`),
+  body('parentComment')
+    .trim(),
 ];
 
 const setComment = (async (req, res, next) => {
@@ -45,8 +40,8 @@ exports.create = [
       author: currentUser,
       datePosted: new Date(),
       message: req.body.message,
-      parent: req.params.parentId,
-      parentModel: req.body.parentModel,
+      parentPost: req.params.parentId,
+      ...(req.body.parentComment && { parentComment: req.body.parentComment }),
     });
 
     if (!validationErrs.isEmpty()) {

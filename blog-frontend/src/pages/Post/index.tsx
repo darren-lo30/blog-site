@@ -7,12 +7,17 @@ import Loader from '../../components/Loader';
 import { useErrorStatus } from '../../ErrorHandler';
 import CommentDisplay from './CommentDisplay';
 import PostCommentInput from './PostCommentInput';
+import Button from '../../components/Button';
 
 type ParamProps = {
   id: string
 }
 
-const Post = () => {
+type PostProps = {
+  signedInId: string
+}
+
+const Post = ({ signedInId }: PostProps) => {
   const [post, setPost] = useState<any>();
   const { id } = useParams<ParamProps>();
   const { setErrorStatusCode } = useErrorStatus();
@@ -51,6 +56,16 @@ const Post = () => {
           <p>{ post.body }</p>
         </section>
 
+        {signedInId === post.author._id ? (
+          <div>
+            <hr className="h-0.5 border-gray-400 bg-gray-700" />
+            <div className="py-3 px-3">
+              <Link to={`/posts/${post._id}/edit`}>
+                <Button color="primary">Edit Post</Button>
+              </Link>
+            </div>
+          </div>
+        ) : null}
         <hr className="h-0.5 border-gray-400 bg-gray-700" />
         <section className="px-3 pt-3">
           <PostCommentInput postId={post._id} getPosts={getPosts} />

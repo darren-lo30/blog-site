@@ -33,7 +33,7 @@ const Template = ({ children, signedInId, setUser }: TemplateProps) => {
   return (
     <div className="min-h-screen flex flex-col items-stretch bg-gray-900">
       <NavBar siteName="Console Log" navItems={navItems} />
-      <div className="text-gray-100 container mx-auto mt-6 px-3">
+      <div className="text-gray-100 container mx-auto mt-6 px-3 flex-1 flex flex-col">
         { children }
       </div>
     </div>

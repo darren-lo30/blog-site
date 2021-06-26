@@ -31,7 +31,7 @@ const Feed = ({ isAdmin }: FeedProps) => {
   }
 
   return (
-    <div>
+    <div className="w-full">
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Feed</h1>
         <span>

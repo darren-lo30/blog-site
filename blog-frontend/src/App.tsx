@@ -91,12 +91,11 @@ const App = () => {
               <AuthRoute exact path="/posts" component={() => <Feed isAdmin={isAdmin} />} signedInId={signedInId} />
 
               <AdminRoute exact component={() => <PostForm action="create" />} path="/posts/new" isAdmin={isAdmin} />
-              <Route exact path="/posts/:id" component={Post} />
+              <AdminRoute exact component={() => <PostForm action="edit" />} path="/posts/:id/edit" isAdmin={isAdmin} />
+              <Route exact path="/posts/:id" component={() => <Post signedInId={signedInId} />} />
               {/* <AdminRoute exact path="/posts/update" isAdmin={isAdmin} /> */}
-              <Route exact path="/users/:id" component={Profile} />
-
-              <Route exact path="/users/update" />
-
+              <Route exact path="/users/:id" component={() => <Profile signedInId={signedInId} />} />
+              {/* <AuthRoute exact path="/users/edit" signedInId={signedInId} component={() => <ProfileEdit userId={signedInId} />} /> */}
               { !signedInId ? (
                 <div>
                   <Route exact path="/sign-up" component={() => <SignUp setUser={setUser} />} />

@@ -64,6 +64,8 @@ const SignUp = ({ setUser }: SignUpProps) => {
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>) => { setName(event.target.value); }
             }
+            className="text-gray-700"
+            required
           />
           <Input
             type="text"
@@ -73,6 +75,7 @@ const SignUp = ({ setUser }: SignUpProps) => {
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>) => { setEmail(event.target.value); }
             }
+            className="text-gray-700"
             required
           />
           <Input
@@ -83,6 +86,7 @@ const SignUp = ({ setUser }: SignUpProps) => {
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setUsername(event.target.value);
             }}
+            className="text-gray-700"
             required
           />
           <Input
@@ -93,6 +97,7 @@ const SignUp = ({ setUser }: SignUpProps) => {
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setPassword(event.target.value);
             }}
+            className="text-gray-700"
             required
           />
           <Button type="submit" color="primary" className="rounded w-full my-3">Sign Up</Button>
