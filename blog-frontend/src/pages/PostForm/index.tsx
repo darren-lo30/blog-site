@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import uniqid from 'uniqid';
 import { useHistory, useParams } from 'react-router-dom';
+import Switch from 'react-switch';
 import Button from '../../components/Button';
 import Input from '../../components/forms/Input';
 import TextArea from '../../components/forms/TextArea';
@@ -19,6 +20,7 @@ type Params = {
 const PostForm = ({ action, signedInId }: PostFormProps) => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+  const [published, setPublished] = useState(true);
   const [errors, setErrors] = useState<string[]>([]);
   const { id } = useParams<Params>();
 
@@ -38,6 +40,7 @@ const PostForm = ({ action, signedInId }: PostFormProps) => {
 
           setTitle(post.title);
           setBody(post.body);
+          setPublished(post.published);
         } catch (error: any) {
           setErrorStatusCode(error.response.status);
         }
@@ -51,12 +54,14 @@ const PostForm = ({ action, signedInId }: PostFormProps) => {
       try {
         if (action === 'create') {
           // Create post
-          await axios.post('/posts', { title, body }, { withCredentials: true });
+          const response = await axios.post('/posts', { title, body, published }, { withCredentials: true });
+          const createdPost = response.data.post;
+          history.push(`/posts/${createdPost._id}`);
         } else {
           // Update post
-          await axios.put(`/posts/${id}`, { title, body }, { withCredentials: true });
+          await axios.put(`/posts/${id}`, { title, body, published }, { withCredentials: true });
+          history.push(`/posts/${id}`);
         }
-        history.push(`/posts/${id}`);
       } catch (error: any) {
         if (error.response.data.validationErrs) {
           // Post data was invalid
@@ -80,7 +85,7 @@ const PostForm = ({ action, signedInId }: PostFormProps) => {
             <li key={uniqid()} className="text-red-200">{ error }</li>
           ))}
         </ul>
-        <div className="py-4">
+        <div className="pt-4 pb-8">
           <Input
             type="text"
             name="title"
@@ -100,8 +105,27 @@ const PostForm = ({ action, signedInId }: PostFormProps) => {
             }
             className="h-32"
           />
+          <div className="flex items-center">
+            <span className="font-bold mr-3">Published</span>
+            <Switch
+              onChange={(nextChecked) => { setPublished(nextChecked); }}
+              checked={published}
+              onColor="#6EE7B7"
+              onHandleColor="#10B981"
+              handleDiameter={20}
+              uncheckedIcon={false}
+              checkedIcon={false}
+              boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+              activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+              height={15}
+              width={48}
+              className="react-switch"
+              id="material-switch"
+            />
+          </div>
         </div>
-        <Button type="submit" color="primary">{action === 'create' ? 'Create' : 'Update'}</Button>
+        <Button type="submit" color="primary" className="mr-3">{action === 'create' ? 'Create' : 'Update'}</Button>
+        <Button type="button" color="secondary" onClick={() => { history.goBack(); }}>Cancel</Button>
       </form>
     </div>
   );

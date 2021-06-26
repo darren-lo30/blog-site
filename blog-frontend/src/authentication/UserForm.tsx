@@ -27,8 +27,15 @@ const UserForm = ({ action, setUser, signedInId }: UserFormProps) => {
 
   useEffect(() => {
     (async () => {
+      // This means it is a User edit form
       if (id) {
+        // Can not edit other users
+        if (id !== signedInId) {
+          history.push('/');
+        }
+
         try {
+          // Get current user data
           const response = await axios.get(`/users/${id}`, { withCredentials: true });
           const { user } = response.data;
 
@@ -90,7 +97,7 @@ const UserForm = ({ action, setUser, signedInId }: UserFormProps) => {
             value={name}
             label="Name"
             onChange={
-              (event: React.ChangeEvent<HTMLInputElement>) => { setName(event.target.value); }
+              (event) => { setName(event.target.value); }
             }
             className="text-gray-700"
             required
@@ -101,7 +108,7 @@ const UserForm = ({ action, setUser, signedInId }: UserFormProps) => {
             value={email}
             label="Email"
             onChange={
-              (event: React.ChangeEvent<HTMLInputElement>) => { setEmail(event.target.value); }
+              (event) => { setEmail(event.target.value); }
             }
             className="text-gray-700"
             required
@@ -111,7 +118,7 @@ const UserForm = ({ action, setUser, signedInId }: UserFormProps) => {
             name="username"
             value={username}
             label="Username"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={(event) => {
               setUsername(event.target.value);
             }}
             className="text-gray-700"
@@ -122,7 +129,7 @@ const UserForm = ({ action, setUser, signedInId }: UserFormProps) => {
             name="password"
             value={password}
             label="Password"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            onChange={(event) => {
               setPassword(event.target.value);
             }}
             className="text-gray-700"

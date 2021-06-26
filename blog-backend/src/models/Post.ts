@@ -27,8 +27,8 @@ PostSchema.virtual('comments', {
 // Determines if a user is allowed to work on this Post
 PostSchema.method(
   'isAuthorized',
-  function isAuthorized(user: IUser) {
-    return user.role === 'admin' || user._id.equals(this.author);
+  function isAuthorized(user: IUser | null) {
+    return user && (user.role === 'admin' || user._id.equals(this.author));
   },
 );
 

@@ -13,6 +13,11 @@ const validatePostParams = () => [
     .trim()
     .isLength({ min: 1 })
     .escape(),
+  body('published', 'Post must either be published or unpublished')
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .toBoolean(),
 ];
 
 const setPost = (async (req, res, next) => {
@@ -41,7 +46,7 @@ const setPost = (async (req, res, next) => {
 exports.index = [
   (async (req, res, next) => {
     try {
-      const allPosts = await Post.find().sort('-datePosted').populate('author').exec();
+      const allPosts = await Post.find({ published: true }).sort('-datePosted').populate('author').exec();
       return res.json({ posts: allPosts });
     } catch (err) {
       return next(err);
@@ -50,9 +55,17 @@ exports.index = [
 ];
 
 exports.show = [
+  authenticateUser,
   setPost,
   (async (req, res, next) => {
-    res.json({ post: res.locals.post });
+    const { post, currentUser } = res.locals;
+
+    // Only allow owner or admin to view unpublished posts
+    if (!post.published && !post.isAuthorized(currentUser)) {
+      return res.status(401);
+    }
+
+    return res.json({ post });
   }) as RequestHandler,
 ];
 
@@ -68,6 +81,7 @@ exports.create = [
       datePosted: new Date(),
       title: req.body.title,
       body: req.body.body,
+      published: req.body.published,
     });
 
     if (!validationErrs.isEmpty()) {
@@ -93,6 +107,7 @@ exports.update = [
 
     post.title = req.body.title;
     post.body = req.body.body;
+    post.published = req.body.published;
 
     if (!validationErrs.isEmpty()) {
       return res.status(422).json({ validationErrs, post });

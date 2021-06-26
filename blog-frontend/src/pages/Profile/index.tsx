@@ -57,7 +57,12 @@ const Profile = ({ signedInId } : ProfileProps) => {
           <ul className="sm:w-2/3 lg:w-1/2">
             { user.posts.map((post: any) => (
               <Link to={`/posts/${post._id}`}>
-                <li className="bg-gray-300 text-gray-900 my-3 rounded px-3 py-2" key={uniqid()}>{post.title}</li>
+                <li
+                  className={`text-gray-900 my-3 rounded px-3 py-2 ${post.published ? 'bg-gray-300' : 'bg-yellow-300'}`}
+                  key={uniqid()}
+                >
+                  {post.title}
+                </li>
               </Link>
             ))}
           </ul>

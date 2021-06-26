@@ -6,10 +6,19 @@ import { body, validationResult } from 'express-validator';
 import { authenticateUser, generateToken } from '@app/auth';
 
 const getUser = (async (req, res, next) => {
+  const { currentUser } = res.locals;
   try {
-    const user = await User.findById(req.params.id)
-      .populate('posts')
-      .populate('comments');
+    const userQuery = User.findById(req.params.id).populate('comments');
+
+    // Populate with both published and unpublished posts if the currentUser is an admin
+    if (currentUser && currentUser._id.equals(req.params.id)) {
+      userQuery.populate('posts');
+    } else {
+      userQuery.populate({ path: 'posts', match: { published: true } });
+    }
+
+    // Query the user
+    const user = await userQuery;
 
     if (!user) {
       return next(createError(404, 'User could not be found'));
@@ -68,6 +77,7 @@ const verifyUser = (async (req, res, next) => {
 /* ----------------------------- Controllers ----------------------------- */
 
 exports.index = [
+  authenticateUser,
   (async (req, res, next) => {
     try {
       const users = await User.find().exec();
@@ -79,6 +89,7 @@ exports.index = [
 ];
 
 exports.show = [
+  authenticateUser,
   getUser,
   (async (req, res, next) => {
     const { user } = res.locals;

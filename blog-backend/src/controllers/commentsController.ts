@@ -62,7 +62,13 @@ exports.update = [
   setComment,
   validateCommentParams(),
   (async (req, res, next) => {
-    const { comment } = res.locals;
+    const { comment, currentUser } = res.locals;
+
+    // Only the author of the comment or admin can edit their own comments
+    if (!comment.isAuthorized(currentUser)) {
+      return res.status(401);
+    }
+
     const validationErrs = validationResult(req);
 
     comment.message = req.body.message;
@@ -84,7 +90,13 @@ exports.delete = [
   authenticateUser,
   setComment,
   (async (req, res, next) => {
-    const { comment } = res.locals;
+    const { comment, currentUser } = res.locals;
+
+    // Only the author of the comment or admin can delete their own comments
+    if (!comment.isAuthorized(currentUser)) {
+      return res.status(401);
+    }
+
     try {
       await comment.deleteOne();
       return res.status(200).json();

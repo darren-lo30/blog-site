@@ -13,7 +13,6 @@ import Error from './pages/Error';
 import Loader from './components/Loader';
 import PostForm from './pages/PostForm';
 import Post from './pages/Post';
-import ProfileEdit from './pages/ProfileEdit';
 import UserForm from './authentication/UserForm';
 
 type AuthRouteProps = {
@@ -89,18 +88,45 @@ const App = () => {
           <ErrorHandler>
             <Switch>
               <Route exact path="/" component={() => <Landing signedInId={signedInId} />} />
-              <AuthRoute exact path="/posts" component={() => <Feed isAdmin={isAdmin} />} signedInId={signedInId} />
 
-              <AdminRoute exact component={() => <PostForm action="create" />} path="/posts/new" isAdmin={isAdmin} />
-              <Route exact component={() => <PostForm action="edit" signedInId={signedInId} />} path="/posts/:id/edit" />
-              <Route exact path="/posts/:id" component={() => <Post signedInId={signedInId} />} />
-              <Route exact path="/users/:id" component={() => <Profile signedInId={signedInId} />} />
+              <AuthRoute
+                exact
+                path="/posts"
+                component={() => <Feed isAdmin={isAdmin} />}
+                signedInId={signedInId}
+              />
+              <AdminRoute
+                exact
+                path="/posts/new"
+                component={() => <PostForm action="create" />}
+                isAdmin={isAdmin}
+              />
+              <AuthRoute
+                exact
+                path="/posts/:id/edit"
+                component={() => <PostForm action="edit" signedInId={signedInId} />}
+                signedInId={signedInId}
+              />
+              <AuthRoute
+                exact
+                path="/posts/:id"
+                component={() => <Post signedInId={signedInId} />}
+                signedInId={signedInId}
+              />
+              <AuthRoute
+                exact
+                path="/users/:id"
+                component={() => <Profile signedInId={signedInId} />}
+                signedInId={signedInId}
+              />
               <AuthRoute
                 exact
                 path="/users/:id/edit"
                 signedInId={signedInId}
                 component={() => <UserForm action="edit" setUser={setUser} signedInId={signedInId} />}
               />
+
+              {/* Authentication Pages */}
               { !signedInId ? (
                 <div>
                   <Route
