@@ -1,18 +1,17 @@
 import User from '@app/models/User';
-import Post from '@app/models/Post';
-import Comment from '@app/models/Comment';
 
 import { RequestHandler } from 'express';
 import createError from 'http-errors';
 import { body, validationResult } from 'express-validator';
-
-import { verifyUser } from '@app/auth-middleware';
+import { authenticateUser, generateToken } from '@app/auth';
 
 const getUser = (async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).exec();
+    const user = await User.findById(req.params.id)
+      .populate('posts')
+      .populate('comments');
 
-    if (user == null) {
+    if (!user) {
       return next(createError(404, 'User could not be found'));
     }
     res.locals.user = user;
@@ -35,14 +34,15 @@ const validateUserParams = () => [
     .isEmail()
     .withMessage('Must be a valid email')
     // Validate that email is not in use by someone else
-    .custom((value) => User.findOne({ email: value }).exec()
-      .then((user) => {
-        if (user) {
-          throw new Error('Email is already in use by another account');
-        }
-        return true;
-      }))
-    .normalizeEmail()
+    .custom(async (value, { req }) => {
+      const userWithEmail = await User.findOne({ email: value }).exec();
+      if (userWithEmail && !userWithEmail._id.equals(req?.params?.id)) {
+        // A user with that email and that is not the current user has that email
+        throw new Error('Email is already in use by another account');
+      }
+      return true;
+    })
+    .normalizeEmail({ gmail_remove_dots: false })
     .toLowerCase(),
   body('username', 'Username is required')
     .trim()
@@ -54,6 +54,16 @@ const validateUserParams = () => [
     .withMessage('Password must be atleast 8 characters long')
     .escape(),
 ];
+
+const verifyUser = (async (req, res, next) => {
+  const { user, currentUser } = res.locals;
+  if (!currentUser.equals(user)) {
+    return res.status(403).json({
+      message: 'Unable to access other user\'s data',
+    });
+  }
+  return next();
+}) as RequestHandler;
 
 /* ----------------------------- Controllers ----------------------------- */
 
@@ -70,13 +80,17 @@ exports.index = [
 
 exports.show = [
   getUser,
-  (async (req, res, next) => res.json({ user: res.locals.user })) as RequestHandler,
+  (async (req, res, next) => {
+    const { user } = res.locals;
+    user.password = null;
+    return res.json({ user });
+  }) as RequestHandler,
 ];
 
 exports.create = [
   validateUserParams(),
   (async (req, res, next) => {
-    const errors = validationResult(req);
+    const validationErrs = validationResult(req);
     const user = new User({
       name: req.body.name,
       email: req.body.email,
@@ -85,8 +99,8 @@ exports.create = [
       role: 'standard',
     });
 
-    if (!errors.isEmpty()) {
-      return res.json({ errors, user });
+    if (!validationErrs.isEmpty()) {
+      return res.status(422).json({ validationErrs, user });
     }
 
     // Create a hashed password for the user
@@ -102,44 +116,44 @@ exports.create = [
 
 exports.update = [
   getUser,
+  authenticateUser,
+  verifyUser,
   validateUserParams(),
   (async (req, res, next) => {
+    const validationErrs = validationResult(req);
+    const { user } = res.locals;
+
+    // Update properties
+    user.name = req.body.name;
+    user.email = req.body.email;
+    user.username = req.body.username;
+    user.password = req.body.password;
+
+    if (!validationErrs.isEmpty()) {
+      return res.status(422).json({ user, validationErrs });
+    }
+
+    try {
+      await user.save();
+      return res.json({ user, token: generateToken(user!) });
+    } catch (updateErr) {
+      return next(updateErr);
+    }
   }) as RequestHandler,
 ];
 
 exports.delete = [
+  getUser,
+  authenticateUser,
   verifyUser,
   (async (req, res, next) => {
-    const { user, currentUser } = res.locals;
-    if (user.equals(currentUser)) {
-      // Delete all posts and comments made by user
-      const userComments = await Comment.find({ author: user._id }).exec();
-      const userPosts = await Post.find({ author: user._id }).exec();
-
-      // Fix posts and comments referencing this user
-      await Promise.all(
-        userComments.map(async (deletedComment) => {
-          // Find all comments with references to this comment and remove the reference
-          const childComments = await Comment.find({ parent: deletedComment._id }).exec();
-          Promise.all(
-            childComments.map((childComment) => {
-              childComment.parent = undefined;
-              return childComment.save();
-            }),
-          );
-          // Delete comment
-          Comment.findByIdAndDelete(user._id).exec();
-        }).concat(
-          userPosts.map(async (deletedPost) => {
-            Post.findByIdAndDelete(deletedPost._id).exec();
-          }),
-        ),
-      );
-
-      // Delete user and logout
-      await User.findByIdAndDelete(user._id).exec();
+    const { user } = res.locals;
+    try {
+      await user.deleteOne();
+      return res.status(200).json();
+    } catch (deleteErr) {
+      return next(deleteErr);
     }
-    return next(createError(401, 'Unable to delete other users'));
   }) as RequestHandler,
 ];
 export default exports;

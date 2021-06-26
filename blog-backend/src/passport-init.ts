@@ -4,6 +4,7 @@ import User, { IUser } from '@app/models/User';
 import { NativeError } from 'mongoose';
 
 import passportJWT from 'passport-jwt';
+import { Request } from 'express';
 
 // Set up passport login authentication
 const LocalStrategy = passportLocal.Strategy;
@@ -30,11 +31,19 @@ passport.use(
 
 // Set up passport session authentication to keep user logged in
 const JWTStrategy = passportJWT.Strategy;
-const ExtractJWT = passportJWT.ExtractJwt;
+
+// Method to extract JWT token from httpOnly cookie being sent
+const cookieExtractor = (req: Request) => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies.token;
+  }
+  return token;
+};
 
 passport.use(new JWTStrategy({
-  secretOrKey: process.env.JWT_SECRET,
-  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET!,
+  jwtFromRequest: cookieExtractor,
 }, async (token, done) => {
   try {
     const user = await User.findById(token._id);

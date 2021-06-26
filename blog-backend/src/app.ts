@@ -14,6 +14,9 @@ import '@app/config';
 import indexRouter from '@app/routes/indexRouter';
 import usersRouter from '@app/routes/usersRouter';
 import authRouter from '@app/routes/authRouter';
+import postsRouter from '@app/routes/postsRouter';
+import commentsRouter from '@app/routes/commentsRouter';
+import cors from 'cors';
 
 // Set up pasport
 import '@app/passport-init';
@@ -26,6 +29,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 
 /* ----------------------------- Mongoose setup ----------------------------- */
 // Connect to database
@@ -42,20 +47,21 @@ db.on('connected', () => { console.log('Connected succesfully'); });
 
 /* ----------------------------- Passport setup ----------------------------- */
 // Set current user from JWT token
-app.use('/', (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+app.use('/', async (req, res, next) => {
+  await passport.authenticate('jwt', { session: false }, (err, user, info) => {
     if (user) {
       res.locals.currentUser = user;
     }
+    next();
   })(req, res);
-  next();
 });
 
 /* --------------------------------- Routes --------------------------------- */
 app.use('/', authRouter);
 app.use('/', indexRouter);
+app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
-
+app.use('/comments', commentsRouter);
 // catch 404 and forward to error handler
 // This is skipped if err exists
 app.use((req, res, next) => {
@@ -63,9 +69,10 @@ app.use((req, res, next) => {
 });
 
 // error handler
+
 // You need next or else error handling middleware will not run
 // Extracts error data and sends as json
-app.use(((err, req, res, next) => res.status(err.status).json({
+app.use(((err, req, res, next) => res.status(err.status || 500).json({
   message: err.message,
 })) as ErrorRequestHandler);
 
