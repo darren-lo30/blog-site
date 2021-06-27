@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const passport_1 = __importDefault(require("passport"));
 const passport_local_1 = __importDefault(require("passport-local"));
-const User_1 = __importDefault(require("@app/models/User"));
+const User_1 = __importDefault(require("./models/User"));
 const passport_jwt_1 = __importDefault(require("passport-jwt"));
 // Set up passport login authentication
 const LocalStrategy = passport_local_1.default.Strategy;

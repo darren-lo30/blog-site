@@ -11,15 +11,15 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const morgan_1 = __importDefault(require("morgan"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const passport_1 = __importDefault(require("passport"));
-require("@app/config");
-const indexRouter_1 = __importDefault(require("@app/routes/indexRouter"));
-const usersRouter_1 = __importDefault(require("@app/routes/usersRouter"));
-const authRouter_1 = __importDefault(require("@app/routes/authRouter"));
-const postsRouter_1 = __importDefault(require("@app/routes/postsRouter"));
-const commentsRouter_1 = __importDefault(require("@app/routes/commentsRouter"));
+require("./config");
+const indexRouter_1 = __importDefault(require("./routes/indexRouter"));
+const usersRouter_1 = __importDefault(require("./routes/usersRouter"));
+const authRouter_1 = __importDefault(require("./routes/authRouter"));
+const postsRouter_1 = __importDefault(require("./routes/postsRouter"));
+const commentsRouter_1 = __importDefault(require("./routes/commentsRouter"));
 const cors_1 = __importDefault(require("cors"));
 // Set up pasport
-require("@app/passport-init");
+require("./passport-init");
 const app = express_1.default();
 // Set up express middleware
 app.use(morgan_1.default('dev'));

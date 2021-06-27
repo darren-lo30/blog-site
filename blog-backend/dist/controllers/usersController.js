@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const User_1 = __importDefault(require("@app/models/User"));
+const User_1 = __importDefault(require("../models/User"));
 const http_errors_1 = __importDefault(require("http-errors"));
 const express_validator_1 = require("express-validator");
-const auth_1 = require("@app/auth");
+const auth_1 = require("../auth");
 const getUser = (async (req, res, next) => {
     const { currentUser } = res.locals;
     try {

@@ -9,7 +9,7 @@
   "scripts": {
     "start": "ts-node ./src/bin/www.ts",
     "dev-server": "nodemon --watch src -e ts --exec npm start",
-    "build": "rimraf ./dist/* && tsc && npm run copy-assets",
+    "build": "rimraf ./dist/* && ttsc -P ./tsconfig.json && npm run copy-assets",
     "copy-assets": "copyfiles -u  1 src/public/**/* dist/"
   },
   "dependencies": {
@@ -54,6 +54,7 @@
     "@types/passport-jwt": "^3.0.5",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
+    "@zerollup/ts-transform-paths": "^1.7.18",
     "copyfiles": "^2.4.1",
     "eslint": "^7.24.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -61,6 +62,7 @@
     "eslint-plugin-import": "^2.22.1",
     "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
+    "ttypescript": "^1.5.12",
     "typescript": "^4.2.4"
   }
 }

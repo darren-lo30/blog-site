@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Comment_1 = __importDefault(require("@app/models/Comment"));
+const Comment_1 = __importDefault(require("../models/Comment"));
 const express_validator_1 = require("express-validator");
 const http_errors_1 = __importDefault(require("http-errors"));
-const auth_1 = require("@app/auth");
+const auth_1 = require("../auth");
 const validateCommentParams = () => [
     express_validator_1.body('message')
         .trim()
