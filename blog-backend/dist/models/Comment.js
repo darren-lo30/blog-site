@@ -19,8 +19,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.commentable = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const commentable = [
+exports.commentable = [
     'Post', 'Comment',
 ];
 const CommentSchema = new mongoose_1.Schema({
@@ -28,8 +29,21 @@ const CommentSchema = new mongoose_1.Schema({
     datePosted: { type: Date, required: true },
     message: { type: String, required: true },
     // If there is no parent, that means parent was deleted
-    parent: { type: mongoose_1.Schema.Types.ObjectId, refPath: 'parentModel', required: false },
-    parentModel: { type: String, required: true, enum: commentable },
+    parentPost: { type: mongoose_1.Schema.Types.ObjectId, refPath: 'Post', required: true },
+    parentComment: { type: mongoose_1.Schema.Types.ObjectId, refPath: 'Comment', required: false },
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+// CommentSchema.pre<IComment>(
+//   'deleteOne',
+//   async function onDelete() {
+//     // Change references of child comments to delete comment to undefined
+//     const childComments = await mongoose.models.Comment.findOne({ parent: this._id }).exec();
+//     await Promise.all(
+//       childComments.map((childComment: IComment) => childComment.save()),
+//     );
+//   },
+// );
+CommentSchema.method('isAuthorized', function isAuthorized(user) {
+    return user.role === 'admin' || user._id.equals(this.author);
 });
 exports.default = mongoose_1.default.model('Comment', CommentSchema);
 //# sourceMappingURL=Comment.js.map

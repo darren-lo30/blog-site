@@ -18,30 +18,50 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const Post_1 = __importDefault(require("@app/models/Post"));
+const Comment_1 = __importDefault(require("@app/models/Comment"));
 const UserSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['admin', 'standard'] },
-});
-/* --------------------------- Virtual population --------------------------- */
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+/* --------------------------- Virtual Properties --------------------------- */
 UserSchema.virtual('posts', {
     ref: 'Post',
-    foreignField: 'author',
     localField: '_id',
+    foreignField: 'author',
+    options: { sort: { datePosted: -1 } },
 });
 UserSchema.virtual('comments', {
     ref: 'Comment',
     localField: '_id',
     foreignField: 'author',
+    options: { sort: { datePosted: -1 } },
 });
-UserSchema
-    .virtual('url')
-    .get(function getUrl() {
-    return `/user/${this._id}`;
+UserSchema.method('isValidPassword', async function isValidPassword(password) {
+    const isValid = await bcryptjs_1.default.compare(password, this.password);
+    return isValid;
+});
+/* ---------------------------------- Hooks --------------------------------- */
+UserSchema.pre('save', async function encryptPassword() {
+    if (!this.isModified('password')) {
+        return;
+    }
+    const hashedPassword = await bcryptjs_1.default.hash(this.password, 10);
+    this.password = hashedPassword;
+});
+// Delete any related models on user deletion
+UserSchema.pre(['deleteOne'], { document: true, query: false }, async function onDelete() {
+    await Post_1.default.deleteMany({ author: this._id });
+    await Comment_1.default.deleteMany({ author: this._id });
 });
 exports.default = mongoose_1.default.model('User', UserSchema);
 //# sourceMappingURL=User.js.map

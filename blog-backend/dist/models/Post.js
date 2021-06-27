@@ -18,13 +18,31 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const Comment_1 = __importDefault(require("./Comment"));
 const PostSchema = new mongoose_1.Schema({
     author: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
-    datePosted: { type: String, required: true },
+    datePosted: { type: Date, required: true },
     title: { type: String, required: true },
     body: { type: String, required: true },
+    published: { type: Boolean, required: true },
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+PostSchema.virtual('comments', {
+    ref: 'Comment',
+    localField: '_id',
+    foreignField: 'parentPost',
+});
+// Determines if a user is allowed to work on this Post
+PostSchema.method('isAuthorized', function isAuthorized(user) {
+    return user && (user.role === 'admin' || user._id.equals(this.author));
+});
+PostSchema.pre('deleteOne', async function onDelete() {
+    // Delete all child comments
+    await Comment_1.default.deleteMany({ parent: this._id });
 });
 exports.default = mongoose_1.default.model('Post', PostSchema);
 //# sourceMappingURL=Post.js.map
