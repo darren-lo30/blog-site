@@ -12,21 +12,23 @@ router.post('/sign-up', usersController.create, async (req, res, next) => {
   const { createdUser } = res.locals;
   // Send user token and their information
   return res.cookie('token', generateToken(createdUser), {
-    sameSite: 'strict', secure: true, path: '/', httpOnly: true,
+    sameSite: 'none', secure: true, path: '/', httpOnly: true,
   }).json({ user: createdUser });
 });
 
 /* --------------------------------- Sign in -------------------------------- */
 router.post(['/sign-in', '/log-in'], (req, res, next) => {
-  passport.authenticate('local', { session: false }, (authErr, user, info) => {
+  passport.authenticate('local', { session: true }, (authErr, user, info) => {
     if (authErr || !user) {
+      console.log(authErr);
+      console.log(user);
       return res.status(401).json({
         msg: 'Unable to login',
       });
     }
     // Send back token to user
     return res.cookie('token', generateToken(user), {
-      sameSite: 'strict', secure: true, path: '/', httpOnly: true,
+      sameSite: 'none', secure: true, path: '/', httpOnly: true,
     }).json({ user });
   })(req, res);
 });
