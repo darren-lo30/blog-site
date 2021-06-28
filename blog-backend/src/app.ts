@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(cors({ credentials: true, origin: process.env.FRONT_END_URL }));
+app.use(cors({ credentials: true, origin: process.env.FRONT_END_URL, exposedHeaders: ['set-cookie'] }));
 
 /* ----------------------------- Mongoose setup ----------------------------- */
 // Connect to database
