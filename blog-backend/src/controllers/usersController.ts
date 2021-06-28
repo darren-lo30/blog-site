@@ -33,8 +33,7 @@ const getUser = (async (req, res, next) => {
 const validateUserParams = () => [
   body('name', 'Name is required')
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
+    .isLength({ min: 1 }),
   // Email is required, not in use, and is in a valid format
   body('email')
     .trim()
@@ -55,13 +54,11 @@ const validateUserParams = () => [
     .toLowerCase(),
   body('username', 'Username is required')
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
+    .isLength({ min: 1 }),
   body('password')
     .trim()
     .isLength({ min: 8 })
-    .withMessage('Password must be atleast 8 characters long')
-    .escape(),
+    .withMessage('Password must be atleast 8 characters long'),
 ];
 
 const verifyUser = (async (req, res, next) => {

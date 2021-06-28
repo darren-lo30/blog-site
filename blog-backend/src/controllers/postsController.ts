@@ -7,16 +7,13 @@ import { authenticateUser } from '@app/auth';
 const validatePostParams = () => [
   body('title', 'A title is required')
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
+    .isLength({ min: 1 }),
   body('body', 'A body for the post is required')
     .trim()
-    .isLength({ min: 1 })
-    .escape(),
+    .isLength({ min: 1 }),
   body('published', 'Post must either be published or unpublished')
     .trim()
     .isLength({ min: 1 })
-    .escape()
     .toBoolean(),
 ];
 
