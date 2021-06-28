@@ -11,7 +11,9 @@ router.post('/sign-up', usersController.create, async (req, res, next) => {
   // After creating the user, initiate sign in
   const { createdUser } = res.locals;
   // Send user token and their information
-  return res.cookie('token', generateToken(createdUser), { sameSite: 'strict', path: '/', httpOnly: true }).json({ user: createdUser });
+  return res.cookie('token', generateToken(createdUser), {
+    sameSite: 'strict', secure: true, path: '/', httpOnly: true,
+  }).json({ user: createdUser });
 });
 
 /* --------------------------------- Sign in -------------------------------- */
@@ -23,7 +25,9 @@ router.post(['/sign-in', '/log-in'], (req, res, next) => {
       });
     }
     // Send back token to user
-    return res.cookie('token', generateToken(user), { sameSite: 'strict', path: '/', httpOnly: true }).json({ user });
+    return res.cookie('token', generateToken(user), {
+      sameSite: 'strict', secure: true, path: '/', httpOnly: true,
+    }).json({ user });
   })(req, res);
 });
 
