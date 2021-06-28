@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  BrowserRouter, Redirect, Route, Switch,
+  HashRouter, Redirect, Route, Switch,
 } from 'react-router-dom';
 import axios from 'axios';
 import Template from './Template';
@@ -82,7 +82,7 @@ const App = () => {
   }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Template signedInId={signedInId} setUser={setUser}>
         {authDone ? (
           <ErrorHandler>
@@ -150,7 +150,7 @@ const App = () => {
           <Loader />
         )}
       </Template>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 export default App;
